@@ -56,20 +56,25 @@ Based on the metrics above, the **70/30 Split** is our official **Champion Model
 
 ---
 
-## 🚀 Future Forecasting Strategies (365 Days)
+## 🚀 Future Forecasting Strategies (365-Day Horizon)
 
-When forecasting into the unknown future, our final code plots two different paths to show a classic data science trade-off: **Visual Smoothness vs. Calendar Accuracy**.
+When forecasting into the unknown future, our codebase implements two comparative extrapolation methodologies. Plotting these side-by-side demonstrates a critical time-series mechanics evaluation: **Local Extrapolation vs. Global Phase Calibration**.
 
-* **Approach A: Training Split Seasonality (`future_predict_train`)**
-  We reuse the seasonal pattern straight from the end of the training split. **Pros:** The forecast connects perfectly smoothly to the test set line on the chart. **Cons:** The peak calendar months might be slightly shifted out of phase.
-* **Approach B: Full 3-Year Seasonality (`future_predict_full`)**
-  We extract the seasonal pattern using the full averaged 3-year dataset. **Pros:** It filters out random historical weather noise and locks future forecasts perfectly to true real-world calendar months. **Cons:** It causes a minor, mathematically expected visual jump where the future forecast begins.
+* **Approach A: Baseline Training Split Seasonality (`future_predict_train`)**
+  We project the seasonal wave sliced exactly from the termination boundary of the training partition. 
+  * **Mechanics:** Because it copies the trailing seasonal array from the train split boundary, its future trajectory visually acts as an identical repeating loop of the test-phase predictions. 
+  * **Result:** While it connects smoothly flowing out of the test data line, **its absolute calendar peaks drift out of phase** with true meteorological cycles because it ignores the latest real-world test data observations.
+* **Approach B: Full Timeline Seasonality (`future_predict_full`)**
+  We extract the noise-filtered seasonal vector derived from the master multi-year historical baseline (all 3 years). 
+  * **Mechanics:** By absorbing the global multi-year average, it neutralizes isolated annual climate anomalies.
+  * **Result:** It successfully locks future temperature peaks and troughs to their true, real-world calendar timing (BMKG standards). Multiplying the trend residuals by this updated global wave introduces a minor, mathematically expected shift at the forecast boundary, but delivers an optimized and physically accurate projection.
 
 ### 💡 Summary & Final Recommendation
-When deciding which forecasting path to deploy, we highly recommend **Approach B (Full 3-Year Seasonality)** as the final production standard. 
 
-* **Why Approach B Wins for Real-World Use:** As observed in our final plots, Approach B successfully reconstructs the **actual yearly climate seasonality**. Because weather forecasting relies heavily on accurate calendar alignment (ensuring the hottest and coolest peaks happen in the correct real-world months), calendar accuracy is far more valuable than perfect chart smoothness.
-* **When to use Approach A:** Approach A is best reserved for UI dashboards or stakeholder presentations where visual continuity (a perfectly smooth line connecting the test set to the future) is prioritized over absolute calendar phase precision.
+For production deployment and real-world implementation, **Approach B is conclusively recommended as the primary standard.**
+
+* **The Justification:** Meteorological forecasting depends fundamentally on absolute calendar alignment—ensuring that maximum peak temperatures project onto the correct dry-season months. Approach B achieves this physical reality by utilizing the globally calibrated seasonal wave.
+* **The Role of Approach A:** Approach A is retained in this repository strictly as an **academic baseline comparison**. It effectively visualizes the mechanical danger of "phase shifting" that occurs when time-series models extrapolate seasonality exclusively from localized split boundaries without updating their internal memory to reflect the latest testing timeline.
 
 ---
 
