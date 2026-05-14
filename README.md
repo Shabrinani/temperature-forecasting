@@ -65,6 +65,12 @@ When forecasting into the unknown future, our final code plots two different pat
 * **Approach B: Full 3-Year Seasonality (`future_predict_full`)**
   We extract the seasonal pattern using the full averaged 3-year dataset. **Pros:** It filters out random historical weather noise and locks future forecasts perfectly to true real-world calendar months. **Cons:** It causes a minor, mathematically expected visual jump where the future forecast begins.
 
+### 💡 Summary & Final Recommendation
+When deciding which forecasting path to deploy, we highly recommend **Approach B (Full 3-Year Seasonality)** as the final production standard. 
+
+* **Why Approach B Wins for Real-World Use:** As observed in our final plots, Approach B successfully reconstructs the **actual yearly climate seasonality**. Because weather forecasting relies heavily on accurate calendar alignment (ensuring the hottest and coolest peaks happen in the correct real-world months), calendar accuracy is far more valuable than perfect chart smoothness.
+* **When to use Approach A:** Approach A is best reserved for UI dashboards or stakeholder presentations where visual continuity (a perfectly smooth line connecting the test set to the future) is prioritized over absolute calendar phase precision.
+
 ---
 
 ## ⚙️ Installation & Usage
