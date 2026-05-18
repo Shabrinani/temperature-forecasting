@@ -124,5 +124,6 @@ To transform the initial working prototype into a scientifically rigorous, produ
 * **Leak-Free Decomposition Boundaries:** Eliminated input data leakage risks by ensuring that multiplicative time-series decomposition happens strictly inside isolated training boundaries.
 * **Automated Validation Loops:** Replaced manual script execution with clean Python dictionary loops to seamlessly train and store independent datasets, scalers, and models (80/20, 70/30, 60/40) in one execution pass.
 * **Bilingual Documentation:** Upgraded repository presentation and metrics reporting to international standards.
+* * **Result:** Increased the model accuration.
 
 📖 **Read the Full Story:** Lessons learned behind this refactoring -> link
