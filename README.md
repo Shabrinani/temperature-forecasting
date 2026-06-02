@@ -17,7 +17,7 @@ The final system supports long-term forecasting up to **365 days ahead** and eva
 
 ## Dataset
 
-The dataset was obtained from **BMKG Stasiun Meteorologi Kemayoran** and is included in this repository as `weather_data.csv`.
+The dataset was obtained from **BMKG Stasiun Meteorologi Kemayoran** and is included in this repository as `temperature_data.csv`.
 
 ### Features
 
