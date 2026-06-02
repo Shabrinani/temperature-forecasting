@@ -1,108 +1,172 @@
-# 🌡️ Temperature Data Forecasting: Statistical Decomposition and LSTM
+# 🌡️ Temperature Forecasting Using STL Decomposition and LSTM
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.0+-orange.svg)](https://tensorflow.org)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-yellowgreen.svg)](https://scikit-learn.org/)
-[![Champion MAPE](https://img.shields.io/badge/Champion%20Test%20MAPE-2.67%25-brightgreen.svg)]()
+[![Champion MAPE](https://img.shields.io/badge/Test%20MAPE-2.67%25-brightgreen.svg)]()
 
-## 🚀 Project Summary
+## Project Overview
 
-This project focuses on forecasting daily temperatures using a hybrid machine learning approach. We combine **Time-Series Decomposition (STL)** with a **Long Short-Term Memory (LSTM)** neural network.
+This project forecasts daily air temperatures using a hybrid time-series forecasting framework that combines **Seasonal-Trend Decomposition (STL)** with **Long Short-Term Memory (LSTM)** neural networks.
 
-A major challenge in weather forecasting is separating repeating seasonal patterns from complex climate trends. Our pipeline solves this by decomposing the data locally to prevent data leakage. We train the LSTM model strictly on the underlying trend, and then re-apply the seasonal patterns to reliably forecast temperatures 365 days into the future.
+The forecasting pipeline separates seasonal patterns from the underlying temperature trend before training. The LSTM model learns only the deseasonalized trend component, while seasonal effects are reintroduced during reconstruction and future forecasting.
 
----
-
-## ✨ Key Features & Code Architecture
-
-* **Clean Helper Functions:** The main pipeline logic is organized into clean, reusable functions (`deseasonalize_data`, `build_lstm_model`, `generate_future_forecast`, and `reverse_scaling_and_seasonality`).
-* **Automated Scenario Loops:** We evaluate three different Train/Test split ratios (**80/20**, **70/30**, and **60/40**). The code uses Python dictionaries (`results`, `model_data`, `trained_models`) to store data cleanly without overwriting variables.
-* **Leak-Free Validation:** Seasonal patterns are extracted strictly inside the training sets to ensure our test evaluation remains 100% fair and accurate.
-* **Rolling Future Forecasts:** The model uses its own predictions to feed back into the input sequence, allowing it to forecast a full year (365 days) into the future.
-* **Side-by-Side Strategy Comparison:** The code generates and plots two different future forecasting strategies (`_train_season` vs. `_full_season`) on the same chart for direct comparison.
+The final system supports long-term forecasting up to **365 days ahead** and evaluates multiple train/test split configurations to identify the most robust forecasting model.
 
 ---
 
-## 📁 Dataset & Preprocessing Pipeline
+## Dataset
 
-The dataset is sourced from **BMKG Stasiun Meteorologi Kemayoran** and is included directly in this repository as `data.csv`.
+The dataset was obtained from **BMKG Stasiun Meteorologi Kemayoran** and is included in this repository as `weather_data.csv`.
 
-### Data Columns
-- **`Tanggal`:** The date of the recorded weather (`YYYY-MM-DD`), used as the dataframe index.
-- **`Temperatur rata-rata (°C)`:** The daily average temperature recorded in degrees Celsius.
+### Features
 
-### Preprocessing Steps
-Before feeding data into the neural network, we apply three main steps:
-1. **Exploratory Data Analysis (EDA):** We temporarily split the date into `Day`, `Month`, and `Year` columns to visualize historical temperature patterns using bar charts.
-2. **Removing Seasonality:** We use multiplicative decomposition (`period=365`) to separate the seasonal waves from the main trend. The raw temperatures are divided by the seasonal wave to create clean, deseasonalized training data.
-3. **Scaling and Windowing:** The data is scaled to a `0 to 1` range using `MinMaxScaler`. We then format it into sequence batches using a sliding window of **`look_back = 30`** days, preparing it perfectly for the LSTM layers.
+| Column | Description |
+|----------|-------------|
+| `Tanggal` | Observation date (`YYYY-MM-DD`) |
+| `Temperatur rata-rata (°C)` | Daily average temperature in Celsius |
 
 ---
 
-## 📊 Model Evaluation & Performance
+## Methodology
 
-The models are trained using Mean Squared Error (MSE) loss and the Adam optimizer. To evaluate true performance, our test predictions are rescaled back to original Celsius values and re-multiplied by the seasonal wave.
+The forecasting pipeline consists of four main stages:
+
+### 1. Exploratory Data Analysis (EDA)
+
+Historical temperature trends are analyzed through yearly, monthly, and daily visualizations.
+
+### 2. Seasonal Decomposition
+
+Multiplicative decomposition (`period = 365`) is applied to separate:
+
+- Trend
+- Seasonal component
+- Residual noise
+
+Only the deseasonalized trend component is used for model training.
+
+### 3. Data Scaling and Windowing
+
+The trend component is normalized using `MinMaxScaler` and transformed into sequential samples using a sliding window:
+
+```python
+look_back = 30
+```
+
+### 4. LSTM Forecasting
+
+An LSTM neural network is trained to learn long-term temperature dynamics and generate future predictions.
+
+---
+
+## Key Technical Features
+
+- Modular helper-function architecture for preprocessing, training, forecasting, and visualization.
+- Leakage-free seasonal decomposition performed independently within each training split.
+- Independent model initialization for every experiment to prevent weight carry-over between evaluation scenarios.
+- Automated evaluation of multiple train/test split configurations (**80/20**, **70/30**, and **60/40**).
+- Recursive forecasting for 365-day future temperature prediction.
+- Comparative evaluation of alternative seasonality reconstruction strategies.
+
+---
+
+## Model Performance
+
+### Final Results
 
 | Scenario | Train MSE | Test MSE | Train MAE | Test MAE | Train MAPE | Test MAPE |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **80/20** | 0.5121 | 1.1641 | 0.5677 | 0.8653 | 1.99% | 2.96% |
-| **🏆 70/30** | **0.4487** | **0.9648** | **0.5141** | **0.7676** | **1.80%** | **2.67%** |
-| **60/40** | 0.4557 | 1.1529 | 0.5148 | 0.8312 | 1.81% | 2.91% |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 80/20 | 0.5121 | 1.1641 | 0.5677 | 0.8653 | 1.99% | 2.96% |
+| **70/30** | **0.4487** | **0.9648** | **0.5141** | **0.7676** | **1.80%** | **2.67%** |
+| 60/40 | 0.4557 | 1.1529 | 0.5148 | 0.8312 | 1.81% | 2.91% |
 
-### 🏆 Champion Model Selection
-Based on the metrics above, the **70/30 Split** is our official **Champion Model**:
-1. **Best Accuracy:** It achieved the lowest overall error on unseen data, resulting in a **Test MAPE of 2.67%** and an average error of just **0.7676°C**.
-2. **Perfect Context Balance:** The 80/20 split suffered from slight tail-end overfitting on a shorter test set, while the 60/40 split gave the model too little historical training data to learn long-term patterns effectively.
+### Best Model
 
----
+The **70/30 train-test split** achieved the best overall performance:
 
-## 🚀 Future Forecasting Strategies (365-Day Horizon)
-
-When forecasting into the unknown future, our codebase implements two comparative extrapolation methodologies. Plotting these side-by-side demonstrates a critical time-series mechanics evaluation: **Local Extrapolation vs. Global Phase Calibration**.
-
-* **Approach A: Baseline Training Split Seasonality (`future_predict_train`)**
-  We project the seasonal wave sliced exactly from the termination boundary of the training partition. 
-  * **Mechanics:** Because it copies the trailing seasonal array from the train split boundary, its future trajectory visually acts as an identical repeating loop of the test-phase predictions. 
-  * **Result:** While it connects smoothly flowing out of the test data line, **its absolute calendar peaks drift out of phase** with true meteorological cycles because it ignores the latest real-world test data observations.
-* **Approach B: Full Timeline Seasonality (`future_predict_full`)**
-  We extract the noise-filtered seasonal vector derived from the master multi-year historical baseline (all 3 years). 
-  * **Mechanics:** By absorbing the global multi-year average, it neutralizes isolated annual climate anomalies.
-  * **Result:** It successfully locks future temperature peaks and troughs to their true, real-world calendar timing (BMKG standards). Multiplying the trend residuals by this updated global wave introduces a minor, mathematically expected shift at the forecast boundary, but delivers an optimized and physically accurate projection.
-
-### 💡 Summary & Final Recommendation
-
-For production deployment and real-world implementation, **Approach B is conclusively recommended as the primary standard.**
-
-* **The Justification:** Meteorological forecasting depends fundamentally on absolute calendar alignment—ensuring that maximum peak temperatures project onto the correct dry-season months. Approach B achieves this physical reality by utilizing the globally calibrated seasonal wave.
-* **The Role of Approach A:** Approach A is retained in this repository strictly as an **academic baseline comparison**. It effectively visualizes the mechanical danger of "phase shifting" that occurs when time-series models extrapolate seasonality exclusively from localized split boundaries without updating their internal memory to reflect the latest testing timeline.
+- **Test MAPE:** 2.67%
+- **Test MAE:** 0.7676°C
+- **Test MSE:** 0.9648
 
 ---
 
-## ⚙️ Installation & Usage
+## Experimental Improvement
+
+During development, a critical evaluation issue was identified where multiple train/test split scenarios were trained sequentially on the same Keras model instance.
+
+The pipeline was refactored so that each experimental scenario initializes a fresh LSTM model before training:
+
+```python
+for scenario in scenarios:
+    model = build_lstm_model()
+    model.fit(...)
+```
+
+This guarantees independent training across experiments and prevents weight carry-over between scenarios.
+
+### Performance Comparison
+
+| Metric | Original Best Model | Improved Best Model |
+|----------|----------|----------|
+| Test MSE | 1.39 | 0.96 |
+| Test MAE | 0.91°C | 0.77°C |
+| Test MAPE | 3.00% | 2.67% |
+
+This refactoring improved both experimental reliability and forecasting performance.
+
+---
+
+## Future Forecasting Strategy
+
+Two approaches were evaluated for future seasonality reconstruction:
+
+### Approach A: Training Season Projection
+
+Uses seasonal patterns extracted exclusively from the training partition.
+
+### Approach B: Global Seasonal Projection (Recommended)
+
+Uses seasonality estimated from the complete historical timeline.
+
+Approach B was selected as the final forecasting strategy because it preserves seasonal phase alignment more accurately and produces forecasts that better reflect real-world annual temperature cycles.
+
+![Prediction Results](assets/prediction_results.png)
+
+---
+
+## How to Run Locally
 
 ### 1. Clone the Repository
-To execute the full forecasting pipeline locally, clone this repository to your local environment:
-```bash
-git clone [https://github.com/username/temperature-forecasting-hybrid.git](https://github.com/username/temperature-forecasting-hybrid.git)
-cd temperature-forecasting-hybrid
-```
-
-### 2. Fetch the Dataset Directly (Optional)
-If you are running experiments in an external cloud environment (such as Google Colab) and strictly need to fetch the core BMKG Kemayoran temperature dataset without cloning the entire codebase, execute the following command:
 
 ```bash
-curl -L -o data.csv [https://github.com/username/temperature-forecasting-hybrid/raw/main/data.csv](https://github.com/username/temperature-forecasting-hybrid/raw/main/data.csv)
+git clone https://github.com/yourusername/temperature-forecasting.git
+cd temperature-forecasting
 ```
 
-### 3. Install Environment Dependencies
-Ensure your execution environment has the required scientific packages configured:
+### 2. Set Up a Virtual Environment
+
+#### Windows
 
 ```bash
-pip install tensorflow pandas numpy scikit-learn statsmodels matplotlib
+python -m venv venv
+.\venv\Scripts\activate
 ```
 
-### 4. Execute the Forecasting Pipeline
-Launch the main execution notebook to reproduce all data scaling routines, leak-free validation loops, and comparative output visualizations:
+#### macOS/Linux
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the Notebook
 
 ```bash
 jupyter notebook Final_Forecasting_Pipeline.ipynb
@@ -110,20 +174,25 @@ jupyter notebook Final_Forecasting_Pipeline.ipynb
 
 ---
 
-## 👥 Credits & Attribution
+## Technical Contributions
 
-This project was originally developed as a Final Project assignment at Institut Teknologi Sepuluh Nopember (ITS) by **Group 3**:
-* **Shabrina Nur Ihsani** (5026221002)
-* **Nailah Azzahra** (5026221010)
-* **Kayla Kirani Kusnadi** (5026221111)
+The final forecasting pipeline was refactored and optimized by **Shabrina Nur Ihsani**.
 
-### 🛠️ Production Refactoring & Optimization
-To transform the initial working prototype into a scientifically rigorous, production-ready pipeline, **Shabrina Nur Ihsani** completed code refactoring and architectural upgrades:
-* **Functional Pipeline Tidying:** Cleaned up unstructured procedural code into highly organized, modular helper functions for processing, modeling, and plotting.
-* **Preventing Weight Inheritance (State Leakage):** Fixed a critical model evaluation flaw where multiple scenarios were trained sequentially on the same Keras instance. The loop now guarantees fresh weight initialization (`build_lstm_model`) for every split to ensure fair comparative metrics.
-* **Leak-Free Decomposition Boundaries:** Eliminated input data leakage risks by ensuring that multiplicative time-series decomposition happens strictly inside isolated training boundaries.
-* **Automated Validation Loops:** Replaced manual script execution with clean Python dictionary loops to seamlessly train and store independent datasets, scalers, and models (80/20, 70/30, 60/40) in one execution pass.
-* **Bilingual Documentation:** Upgraded repository presentation and metrics reporting to international standards.
-* * **Result:** Increased the model accuration.
+Key contributions include:
 
-📖 **Read the Full Story:** Lessons learned behind this refactoring -> link
+- Refactoring the forecasting workflow into modular helper functions.
+- Designing automated multi-scenario evaluation pipelines.
+- Eliminating model weight carry-over between experiments through independent model initialization.
+- Improving forecasting performance, resulting in a best model achieving **2.67% Test MAPE**.
+
+---
+
+## Credits
+
+This project was developed as a Final Project assignment at **Institut Teknologi Sepuluh Nopember (ITS)**.
+
+### Group 3
+
+- **Shabrina Nur Ihsani**
+- **Nailah Azzahra**
+- **Kayla Kirani Kusnadi**
