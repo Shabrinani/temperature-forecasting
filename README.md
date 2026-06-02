@@ -131,6 +131,8 @@ Uses seasonality estimated from the complete historical timeline.
 
 Approach B was selected as the final forecasting strategy because it preserves seasonal phase alignment more accurately and produces forecasts that better reflect real-world annual temperature cycles.
 
+### Prediction Result
+
 ![Prediction Results](assets/prediction_result.png)
 
 ---
