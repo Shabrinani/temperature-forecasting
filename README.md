@@ -1,4 +1,4 @@
-# 🌡️ Temperature Forecasting Using STL Decomposition and LSTM
+# Temperature Forecasting Using STL Decomposition and LSTM
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.0+-orange.svg)](https://tensorflow.org)
